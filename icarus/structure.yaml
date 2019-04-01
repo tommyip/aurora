@@ -1,0 +1,58 @@
+- path: posts
+  subdirectory: []
+
+- path: templates
+  subdirectory:
+    - filename: base.html
+      content: |
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <meta http-equiv="X-UA-Compatible" content="ie=edge">
+          <title>{% block title %}{% endblock %}</title>
+          {% block head %}{% endblock %}
+        </head>
+        <body>
+          {% block content %}{% endblock %}
+        </body>
+        </html>
+    - filename: post.html
+      content: |
+        ---
+        url: /blog/:year/:month/:title
+        ---
+
+        {% extends "base.html" %}
+
+        {% block title %}{{ title }} - Blog{% endblock %}
+        {% block content %}
+          <h1>{{ self.title() }}</h1>
+          <div>{{ content }}</div>
+        {% endblock %}
+
+- path: pages
+  subdirectory:
+    - filename: index.html
+      content: |
+        ---
+        url: /
+        ---
+
+        {% extends "base.html" %}
+
+        {% block title %}Home{% endblock %}
+        {% block content %}
+          <h1>Hello world!</h1>
+        {% endblock %}
+
+- path: static
+  subdirectory:
+    - path: images
+      subdirectory: []
+    - filename: style.css
+      content: ''
+
+- filename: config.yaml
+  content: ''
