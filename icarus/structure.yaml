@@ -21,7 +21,7 @@
     - filename: post.html
       content: |
         ---
-        url: /blog/:year/:month/:title
+        permalink: /blog/:year/:month/:title
         ---
 
         {% extends "base.html" %}
@@ -37,7 +37,7 @@
     - filename: index.html
       content: |
         ---
-        url: /
+        permalink: /
         ---
 
         {% extends "base.html" %}

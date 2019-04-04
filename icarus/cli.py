@@ -1,7 +1,8 @@
 import argparse
 import sys
 
-from . import generator, scaffold
+import generator
+import scaffold
 
 parser = argparse.ArgumentParser(description='Icarus')
 subparsers = parser.add_subparsers(dest='command')
