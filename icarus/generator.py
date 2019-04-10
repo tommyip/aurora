@@ -109,6 +109,7 @@ class Generator:
             'permalink', self.context['config'].get('permalink', PERMALINK))
 
         for post in os.listdir('posts'):
+            # Rendering
             jinjadown = self.env.get_template(post)
             markdown = jinjadown.render(config=self.context['config'],
                                         **self.frontmatters['posts'][post])
@@ -116,7 +117,10 @@ class Generator:
             self.frontmatters['posts'][post]['content'] = html
             output = post_template.render(
                 self.context, post=self.frontmatters['posts'][post])
+
+            # Distribution
             url = self._resolve_post_permalink(permalink, post)
+            self.frontmatters['posts'][post]['url'] = url
             self._write_to_dist(url, output)
 
     def _render_pages(self):
