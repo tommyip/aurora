@@ -119,6 +119,12 @@ class Generator:
             url = self._resolve_post_permalink(permalink, post)
             self._write_to_dist(url, output)
 
+    def _render_pages(self):
+        for page in os.listdir('pages'):
+            template = self.env.get_template(page)
+            html = template.render(self.context)
+            self._write_to_dist(page, html)
+
     @staticmethod
     def _write_to_dist(path, content):
         full_path = os.path.join(OUTPUT_DIR, path)
@@ -135,3 +141,4 @@ class Generator:
         self._load_config()
         self._render_posts()
         self.context.update(self.frontmatters())
+        self._render_pages()
