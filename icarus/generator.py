@@ -8,9 +8,7 @@ from jinja2 import Environment, FileSystemLoader
 from jinja2.ext import Extension
 
 import utils
-from defaults import PERMALINK
-
-OUTPUT_DIR = 'dist'
+from defaults import OUTPUT_DIR, PERMALINK
 
 
 class FormatError(Exception):
@@ -30,7 +28,7 @@ class FrontMatterExtension(Extension):
     def preprocess(self, source, name, _filename=None):
         matches = re.search(r'^(?:---(.*)---)?\s*(.*)$', source, re.DOTALL)
         if matches:
-            self.data[name] = yaml.load(matches.group(1) or '')
+            self.data[name] = yaml.load(matches.group(1) or '') or {}
         return matches.group(2)
 
 
@@ -100,7 +98,10 @@ class Generator:
 
     def _render_posts(self):
         markdown_renderer = mistune.Markdown()
-        de_permalink = self.context['config'].get('permalink', PERMALINK)
+        post_fm = self.frontmatters.get('post.html', {})
+        permalink = post_fm.get(
+            'permalink', self.context['config'].get('permalink', PERMALINK))
+
         for post in os.listdir('posts'):
             jinjadown = self.env.get_template(post)
             markdown = jinjadown.render(config=self.context['config'],
@@ -109,9 +110,7 @@ class Generator:
             self.frontmatters[post]['content'] = html
             output = self.env.get_template('post.html').render(
                 post=self.frontmatters[post], config=self.context['config'])
-            url = self._resolve_post_permalink(
-                self.frontmatters['post.html'].get('permalink', de_permalink),
-                post)
+            url = self._resolve_post_permalink(permalink, post)
             self._write_to_dist(url, output)
 
     @staticmethod

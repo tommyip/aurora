@@ -16,6 +16,9 @@ class Dict:
     def __call__(self):
         return self.dict
 
+    def get(self, key, value=None):
+        return self.dict.get(key, value)
+
 
 def partial_class(class_, *args, **kwds):
     class NewClass(class_):

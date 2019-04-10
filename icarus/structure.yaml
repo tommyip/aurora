@@ -20,10 +20,6 @@
         </html>
     - filename: post.html
       content: |
-        ---
-        permalink: /blog/:year/:month/:title
-        ---
-
         {% extends "base.html" %}
 
         {% block title %}{{ post.title }} - Blog{% endblock %}
@@ -36,10 +32,6 @@
   subdirectory:
     - filename: index.html
       content: |
-        ---
-        permalink: /
-        ---
-
         {% extends "base.html" %}
 
         {% block title %}Home{% endblock %}
