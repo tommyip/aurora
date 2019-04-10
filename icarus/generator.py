@@ -25,10 +25,14 @@ class FrontMatterExtension(Extension):
         self.data = data
         super(FrontMatterExtension, self).__init__(environment)
 
-    def preprocess(self, source, name, _filename=None):
+    def preprocess(self, source, name, filename=None):
         matches = re.search(r'^(?:---(.*)---)?\s*(.*)$', source, re.DOTALL)
+        base = os.path.dirname(filename)
         if matches:
-            self.data[name] = yaml.load(matches.group(1) or '') or {}
+            self.data[base][name] = yaml.load(matches.group(1) or '') or {}
+        else:
+            self.data[base][name] = {}
+
         return matches.group(2)
 
 
@@ -46,7 +50,8 @@ class Generator:
     """
     def __init__(self):
         self.context = dict()
-        self.frontmatters = utils.Dict()
+        self.frontmatters = utils.Dict(
+            {'pages': {}, 'templates': {}, 'posts': {}})
         FME = utils.partial_class(FrontMatterExtension, data=self.frontmatters)
         self.env = Environment(
             loader=FileSystemLoader(['pages', 'templates', 'posts']),
@@ -69,7 +74,7 @@ class Generator:
         `yyyy-mm-dd-title(-title)*.md`.
         """
         path = []
-        category = self.frontmatters[filename].get('category')
+        category = self.frontmatters['posts'][filename].get('category')
         year, month, day, *titles = filename.replace('.md', '').split('-')
         for segment in permalink[1:].split('/'):
             if segment.startswith(':'):
@@ -98,18 +103,19 @@ class Generator:
 
     def _render_posts(self):
         markdown_renderer = mistune.Markdown()
-        post_fm = self.frontmatters.get('post.html', {})
+        post_template = self.env.get_template('post.html')
+        post_fm = self.frontmatters['templates'].get('post.html', {})
         permalink = post_fm.get(
             'permalink', self.context['config'].get('permalink', PERMALINK))
 
         for post in os.listdir('posts'):
             jinjadown = self.env.get_template(post)
             markdown = jinjadown.render(config=self.context['config'],
-                                        **self.frontmatters[post])
+                                        **self.frontmatters['posts'][post])
             html = markdown_renderer(markdown)
-            self.frontmatters[post]['content'] = html
-            output = self.env.get_template('post.html').render(
-                post=self.frontmatters[post], config=self.context['config'])
+            self.frontmatters['posts'][post]['content'] = html
+            output = post_template.render(
+                self.context, post=self.frontmatters['posts'][post])
             url = self._resolve_post_permalink(permalink, post)
             self._write_to_dist(url, output)
 
@@ -125,6 +131,7 @@ class Generator:
         if os.path.exists(OUTPUT_DIR):
             shutil.rmtree(OUTPUT_DIR)
         os.makedirs(OUTPUT_DIR)
+
         self._load_config()
         self._render_posts()
-        self.context['posts'] = self.frontmatters()
+        self.context.update(self.frontmatters())

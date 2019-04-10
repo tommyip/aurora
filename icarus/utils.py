@@ -4,8 +4,8 @@ import functools
 class Dict:
     """ A dictionary wrapped in a class.
     """
-    def __init__(self):
-        self.dict = {}
+    def __init__(self, init=None):
+        self.dict = init or {}
 
     def __getitem__(self, key):
         return self.dict[key]
