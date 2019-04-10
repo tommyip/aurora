@@ -7,8 +7,8 @@ import yaml
 from jinja2 import Environment, FileSystemLoader
 from jinja2.ext import Extension
 
-import utils
-from defaults import OUTPUT_DIR, PERMALINK
+from icarus import utils
+from icarus.defaults import OUTPUT_DIR, PERMALINK
 
 
 class FormatError(Exception):
@@ -137,7 +137,7 @@ class Generator:
         with open(full_path, 'w') as f:
             f.write(content)
 
-    def generate(self):
+    def run(self):
         if os.path.exists(OUTPUT_DIR):
             shutil.rmtree(OUTPUT_DIR)
         os.makedirs(OUTPUT_DIR)

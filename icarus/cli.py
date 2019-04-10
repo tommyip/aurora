@@ -1,20 +1,24 @@
-import argparse
-import sys
+"""Icarus - an intentionally minimal static site generator.
 
-import generator
-import scaffold
+usage:
+    icarus create <project_name>
+    icarus build
 
-parser = argparse.ArgumentParser(description='Icarus')
-subparsers = parser.add_subparsers(dest='command')
+options:
+    -h --help  Show this screen.
+    --version  Show version.
 
-parser_init = subparsers.add_parser('init', help='Create a new blog')
-parser_init.add_argument('project_name', type=str, help='Name of the project')
+"""
+from docopt import docopt
 
-args = parser.parse_args()
-if not len(sys.argv) > 1:
-    # Build static site
-    gen = generator.Generator()
-    gen.generate()
+from icarus import __version__, scaffold
+from icarus.generator import Generator
 
-if args.command == 'init':
-    scaffold.init(args.project_name)
+
+def cli():
+    args = docopt(__doc__, version=__version__)
+
+    if args['create']:
+        scaffold.init(args['<project_name>'])
+    elif args['build']:
+        Generator().run()
