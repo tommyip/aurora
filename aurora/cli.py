@@ -1,8 +1,8 @@
-"""Icarus - an intentionally minimal static site generator.
+"""Aurora - an intentionally minimal static site generator.
 
 usage:
-    icarus create <project_name>
-    icarus build
+    aurora create <project_name>
+    aurora build
 
 options:
     -h --help  Show this screen.
@@ -13,8 +13,8 @@ import sys
 
 from docopt import docopt
 
-from icarus import __version__, scaffold
-from icarus.generator import Generator
+from aurora import __version__, scaffold
+from aurora.generator import Generator
 
 
 def cli():

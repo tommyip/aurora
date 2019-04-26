@@ -1,10 +1,10 @@
 from setuptools import setup, find_packages
 
-from icarus import __version__
+from aurora import __version__
 
-setup(name='icarus',
+setup(name='aurora',
       version=__version__,
       packages=find_packages(),
       entry_points={
-          'console_scripts': ['icarus = icarus.cli:cli']
+          'console_scripts': ['aurora = aurora.cli:cli']
       })

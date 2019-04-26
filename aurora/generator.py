@@ -7,8 +7,8 @@ import yaml
 from jinja2 import Environment, FileSystemLoader
 from jinja2.ext import Extension
 
-from icarus import utils
-from icarus.defaults import OUTPUT_DIR, PERMALINK
+from aurora import utils
+from aurora.defaults import OUTPUT_DIR, PERMALINK
 
 
 class FormatError(Exception):
