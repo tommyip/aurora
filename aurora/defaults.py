@@ -1,3 +1,5 @@
-OUTPUT_DIR = 'dist'
-STATIC_DIR = 'static'
-PERMALINK = '/blog/:year/:month/:title'
+DEFAULTS = {
+    'output_dir': 'dist',
+    'static_dir': 'static',
+    'permalink': '/blog/:year/:month/:title',
+}

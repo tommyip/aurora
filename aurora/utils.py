@@ -1,5 +1,7 @@
 import functools
 
+import yaml
+
 
 class Dict:
     """ A dictionary wrapped in a class.
@@ -25,3 +27,9 @@ def partial_class(class_, *args, **kwds):
         __init__ = functools.partialmethod(class_.__init__, *args, **kwds)
 
     return NewClass
+
+
+def load_yaml(content):
+    """ Return an object instead of None even when the input is empty.
+    """
+    return yaml.load(content or '') or {}

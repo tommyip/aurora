@@ -3,12 +3,11 @@ import re
 import shutil
 
 import mistune
-import yaml
 from jinja2 import Environment, FileSystemLoader
 from jinja2.ext import Extension
 
 from aurora import utils
-from aurora.defaults import OUTPUT_DIR, STATIC_DIR, PERMALINK
+from aurora.defaults import DEFAULTS
 
 
 class FormatError(Exception):
@@ -29,7 +28,7 @@ class FrontMatterExtension(Extension):
         matches = re.search(r'^(?:---(.*)---)?\s*(.*)$', source, re.DOTALL)
         base = os.path.dirname(filename)
         if matches:
-            self.data[base][name] = yaml.load(matches.group(1) or '') or {}
+            self.data[base][name] = utils.load_yaml(matches.group(1))
         else:
             self.data[base][name] = {}
 
@@ -49,6 +48,7 @@ class Generator:
       3. Load and render pages
     """
     def __init__(self):
+        self.config = dict()
         self.context = dict()
         self.frontmatters = utils.Dict(
             {'pages': {}, 'templates': {}, 'posts': {}})
@@ -59,8 +59,10 @@ class Generator:
             extensions=[FME])
 
     def _load_config(self):
+        self.context['config'] = DEFAULTS
         with open('config.yaml', 'r') as f:
-            self.context['config'] = yaml.load(f.read())
+            self.context['config'].update(utils.load_yaml(f.read()))
+        self.config = self.context['config']
 
     def _resolve_post_permalink(self, permalink, filename):
         """ Resolves a permalink against a filename and its frontmatter and
@@ -106,12 +108,12 @@ class Generator:
         post_template = self.env.get_template('post.html')
         post_fm = self.frontmatters['templates'].get('post.html', {})
         permalink = post_fm.get(
-            'permalink', self.context['config'].get('permalink', PERMALINK))
+            'permalink', self.config['permalink'])
 
         for post in os.listdir('posts'):
             # Rendering
             jinjadown = self.env.get_template(post)
-            markdown = jinjadown.render(config=self.context['config'],
+            markdown = jinjadown.render(config=self.config,
                                         **self.frontmatters['posts'][post])
             html = markdown_renderer(markdown)
             self.frontmatters['posts'][post]['content'] = html
@@ -130,22 +132,23 @@ class Generator:
             self._write_to_dist(page, html)
 
     def _copy_static(self):
-        shutil.copytree(STATIC_DIR, os.path.join(OUTPUT_DIR, 'static'))
+        shutil.copytree(
+            self.config['static_dir'],
+            os.path.join(self.config['output_dir'], 'static'))
 
-    @staticmethod
-    def _write_to_dist(path, content):
-        full_path = os.path.join(OUTPUT_DIR, path)
+    def _write_to_dist(self, path, content):
+        full_path = os.path.join(self.config['output_dir'], path)
         if not os.path.exists(os.path.dirname(full_path)):
             os.makedirs(os.path.dirname(full_path))
         with open(full_path, 'w') as f:
             f.write(content)
 
     def run(self):
-        if os.path.exists(OUTPUT_DIR):
-            shutil.rmtree(OUTPUT_DIR)
-        os.makedirs(OUTPUT_DIR)
-
         self._load_config()
+        if os.path.exists(self.config['output_dir']):
+            shutil.rmtree(self.config['output_dir'])
+        os.makedirs(self.config['output_dir'])
+
         self._render_posts()
         self.context.update(self.frontmatters())
         self._render_pages()
