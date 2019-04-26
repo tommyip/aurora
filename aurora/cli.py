@@ -2,6 +2,7 @@
 
 usage:
     aurora create <project_name>
+    aurora new <post_title>
     aurora build
 
 options:
@@ -24,6 +25,8 @@ def cli():
     args = docopt(__doc__, version=__version__)
 
     if args['create']:
-        scaffold.init(args['<project_name>'])
+        scaffold.create(args['<project_name>'])
+    elif args['new']:
+        scaffold.new(args['<post_title>'])
     elif args['build']:
         Generator().run()
