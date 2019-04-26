@@ -8,7 +8,7 @@ from jinja2 import Environment, FileSystemLoader
 from jinja2.ext import Extension
 
 from aurora import utils
-from aurora.defaults import OUTPUT_DIR, PERMALINK
+from aurora.defaults import OUTPUT_DIR, STATIC_DIR, PERMALINK
 
 
 class FormatError(Exception):
@@ -129,6 +129,9 @@ class Generator:
             html = template.render(self.context)
             self._write_to_dist(page, html)
 
+    def _copy_static(self):
+        shutil.copytree(STATIC_DIR, os.path.join(OUTPUT_DIR, 'static'))
+
     @staticmethod
     def _write_to_dist(path, content):
         full_path = os.path.join(OUTPUT_DIR, path)
@@ -146,3 +149,4 @@ class Generator:
         self._render_posts()
         self.context.update(self.frontmatters())
         self._render_pages()
+        self._copy_static()
