@@ -1,6 +1,7 @@
 import os
 import re
 import shutil
+import sys
 
 import mistune
 from jinja2 import Environment, FileSystemLoader
@@ -8,12 +9,6 @@ from jinja2.ext import Extension
 
 from aurora import utils
 from aurora.defaults import DEFAULTS
-
-
-class FormatError(Exception):
-    """ Raised when the format of a template is malformed.
-    """
-    pass
 
 
 class FrontMatterExtension(Extension):
@@ -91,13 +86,13 @@ class Generator:
                     if category:
                         path.append(category)
                     else:
-                        raise FormatError('Frontmatter does not contain a \
-                            category variable but the permalink calls for it.')
+                        sys.exit('The frontmatter does not contain a category \
+                            variable but the permalink requires it.')
                 elif placeholder == 'title':
                     path.append('-'.join(titles))
                 else:
-                    raise FormatError(
-                        'Unknown placeholder `{}`.'.format(placeholder))
+                    sys.exit('Unknown placeholder `{}` in permalink.'.format(
+                        placeholder))
             else:
                 path.append(segment)
 

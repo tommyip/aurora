@@ -1,4 +1,5 @@
 import os
+import sys
 from datetime import datetime
 
 import yaml
@@ -26,8 +27,8 @@ def create(project_name):
             structure = yaml.load(f.read())
         scaffold(structure, project_name)
 
-    except OSError as e:
-        print(e)
+    except OSError:
+        sys.exit('Directory with name `' + project_name + '` already exist.')
 
 
 def new(post_title):
@@ -38,8 +39,7 @@ def new(post_title):
     output_path = os.path.join('posts', post_name)
 
     if os.path.exists(output_path):
-        print('You have already created a post with this title today.')
-        return
+        sys.exit('You have already created a post with this title today.')
 
     humanize_post_title = post_title.replace('-', ' ').capitalize()
     with open(output_path, 'w') as f:
