@@ -1,4 +1,4 @@
-"""Aurora - an intentionally minimal static site generator.
+"""Aurora - a minimalist, blog-aware static site generator
 
 usage:
     aurora create <project_name>
